@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkEase — Vehicle Sign-out &amp; Receipting</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/logo.png">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav__brand">
+    <img src="assets/logo.png" alt="ParkEase" style="width:30px;height:30px;border-radius:6px;object-fit:cover">
+    <span class="topnav__brand-name">ParkEase — Sign-out</span>
+  </div>
+  <div class="topnav__links">
+    <a href="dashboard.html" class="topnav__link">⊞ Dashboard</a>
+    <a href="register.html"  class="topnav__link">🚗 In-Vehicle</a>
+    <a href="signout.html"   class="topnav__link is-active">↗ Out-Vehicle</a>
+    <a href="reports.html"   class="topnav__link">📊 Reports</a>
+  </div>
+  <div class="topnav__user">
+    <div class="topnav__user-text">
+      <strong id="user-name">—</strong>
+      <small>Attendant</small>
+    </div>
+    <div class="topnav__avatar" id="user-avatar">—</div>
+    <button class="btn btn--ghost btn--sm" onclick="logout()">⏏</button>
+  </div>
+</nav>
+
+<div class="page-wrapper--wide">
+
+  <!-- Search Bar -->
+  <div class="signout-search-row">
+    <span style="font-size:18px;color:var(--text-muted)">🔍</span>
+    <input
+      type="text"
+      id="search-input"
+      placeholder="TYPE PLATE OR RECEIPT ID — e.g. UAX123A or PE-2026-03-0112"
+    >
+    <button class="btn btn--primary" onclick="searchVehicle()">Search Vehicle</button>
+  </div>
+
+  <!-- Two-Panel Grid -->
+  <div class="two-panel-grid">
+
+    <!-- LEFT — Vehicle & Receiver Details -->
+    <div class="panel-card">
+      <div class="panel-card__header">
+        <div class="panel-card__title">🚐 Vehicle &amp; Receiver Details</div>
+        <span class="badge badge--amber" id="status-badge">PENDING SIGN-OUT</span>
+      </div>
+      <div class="panel-card__body">
+
+        <!-- Empty state -->
+        <div id="no-vehicle-msg" class="empty-state">
+          <div class="empty-state__icon">🔍</div>
+          <p>Search for a plate number or receipt ID above to load vehicle and billing details.</p>
+          <p style="margin-top:8px;font-size:11px;font-family:var(--font-mono);color:var(--text-muted)">
+            Try: UAX123A · UBD123X · UBA551G · UCB778P
+          </p>
+        </div>
+
+        <!-- Vehicle details (shown after search) -->
+        <div id="vehicle-details" style="display:none">
+
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Driver Name</label>
+              <span id="d-driver">—</span>
+            </div>
+            <div class="detail-item">
+              <label>Vehicle Type</label>
+              <span id="d-type">—</span>
+            </div>
+            <div class="detail-item">
+              <label>Arrival Time</label>
+              <span id="d-arrival">—</span>
+            </div>
+            <div class="detail-item">
+              <label>Duration Parked</label>
+              <span id="d-duration" style="font-family:var(--font-mono);color:var(--color-navy-700)">—</span>
+            </div>
+          </div>
+
+          <div class="fee-display">
+            <div class="fee-display__label">Calculated Parking Fee</div>
+            <div class="fee-display__amount" id="d-fee">UGX 0</div>
+            <div class="fee-display__rate" id="d-fee-rate">Rate Applied: —</div>
+          </div>
+
+          <!-- Receiver Form -->
+          <div style="border-top:1px solid var(--border-color);padding-top:20px;margin-top:4px">
+            <div style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;gap:6px">
+              👤 Receiver Information
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);font-weight:400">(person collecting the vehicle)</span>
+            </div>
+            <form id="receiver-form" novalidate>
+              <div class="form-row" style="margin-bottom:14px">
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Receiver Full Name</label>
+                  <input type="text" id="receiver-name" class="form-control-light" placeholder="As shown on National ID">
+                  <div class="form-error" id="receiver-name-error"></div>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Phone Number</label>
+                  <div class="input-group">
+                    <span class="input-group__prefix" style="font-size:11px">+256</span>
+                    <input type="text" id="receiver-phone" class="form-control-light" placeholder="700 000 000">
+                  </div>
+                  <div class="form-error" id="receiver-phone-error"></div>
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom:18px">
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">NIN Number</label>
+                  <input
+                    type="text"
+                    id="receiver-nin"
+                    class="form-control-light"
+                    placeholder="CM12345678A"
+                    style="text-transform:uppercase;letter-spacing:1px;font-family:var(--font-mono)"
+                  >
+                  <div class="form-error" id="receiver-nin-error"></div>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Gender</label>
+                  <select id="receiver-gender" class="form-control-light">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="submit" class="btn btn--teal" style="flex:1;justify-content:center">
+                  🛡 Confirm Payment &amp; Sign-out
+                </button>
+                <button type="button" class="btn btn--ghost" onclick="cancelSignout()">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — Receipt Preview -->
+    <div class="panel-card">
+      <div class="panel-card__header">
+        <div class="panel-card__title">🧾 Receipt Preview</div>
+        <button class="btn btn--ghost btn--sm" onclick="printReceipt()">🖨 Print</button>
+      </div>
+      <div class="panel-card__body">
+
+        <div id="no-receipt-msg" class="empty-state" style="padding:30px 10px">
+          <div class="empty-state__icon">🧾</div>
+          <p>Receipt will appear here after you search and load a vehicle.</p>
+        </div>
+
+        <div class="receipt" id="receipt-preview" style="display:none">
+          <div class="receipt__header">
+            <img src="assets/logo.png" alt="ParkEase" style="width:48px;height:48px;border-radius:10px;object-fit:cover;margin:0 auto 8px">
+            <div class="receipt__company">PARKEASE SYSTEMS LTD</div>
+            <div class="receipt__address">
+              Plot 45, Kampala Road, Kampala, Uganda<br>
+              TIN: 1009876543 · Tel: +256 414 000 000
+            </div>
+          </div>
+
+          <hr class="receipt__divider">
+
+          <div class="receipt__row">
+            <span class="r-label">Receipt No:</span>
+            <span class="r-value" id="r-no">—</span>
+          </div>
+          <div class="receipt__row">
+            <span class="r-label">Date:</span>
+            <span class="r-value" id="r-date">—</span>
+          </div>
+          <div class="receipt__row">
+            <span class="r-label">Plate No:</span>
+            <span class="r-value" id="r-plate" style="font-weight:700;letter-spacing:1px">—</span>
+          </div>
+          <div class="receipt__row">
+            <span class="r-label">Category:</span>
+            <span class="r-value" id="r-category">—</span>
+          </div>
+
+          <hr class="receipt__divider">
+
+          <div class="receipt__row">
+            <span class="r-label">Check-in:</span>
+            <span class="r-value" id="r-checkin">—</span>
+          </div>
+          <div class="receipt__row">
+            <span class="r-label">Duration:</span>
+            <span class="r-value" id="r-duration-r">—</span>
+          </div>
+
+          <div class="receipt__total">
+            <span class="r-label">TOTAL AMOUNT</span>
+            <span class="r-value" id="r-total">UGX 0</span>
+          </div>
+
+          <div class="receipt__row" style="margin-top:4px">
+            <span class="r-label">Receiver:</span>
+            <span class="r-value" id="r-receiver">—</span>
+          </div>
+          <div class="receipt__row">
+            <span class="r-label">NIN (masked):</span>
+            <span class="r-value" id="r-nin">—</span>
+          </div>
+
+          <div class="receipt__qr-zone">
+            <div class="receipt__qr-placeholder"></div>
+            <div class="receipt__qr-label">Scan to Verify</div>
+          </div>
+
+          <div class="receipt__footer">
+            <p>THANK YOU FOR USING PARKEASE!</p>
+            <small>Guaranteed Safety · support@parkease.ug</small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <span class="modal-box__icon">✅</span>
+    <h2 class="modal-box__title">Sign-out Confirmed!</h2>
+    <p class="modal-box__message">
+      Vehicle successfully signed out. Payment received and receipt generated.
+    </p>
+    <div class="modal-box__receipt-no" id="confirm-receipt-no">—</div>
+    <div class="modal-box__actions">
+      <button class="btn btn--primary" onclick="closeConfirmModal()">🖨 Print Receipt</button>
+      <button class="btn btn--outline" onclick="goToDashboard()">Go to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/validation.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/signout.js"></script>
+</body>
+</html>
