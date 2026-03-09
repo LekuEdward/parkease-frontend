@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkEase — Admin Revenue Reports</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    /* ── Service image thumbnails on revenue cards ── */
+    .rev-card__img-strip {
+      width: 100%;
+      height: 72px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+      display: block;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav__brand">
+    <img src="assets/logo.png" alt="ParkEase" style="width:30px;height:30px;border-radius:6px;object-fit:cover">
+    <span class="topnav__brand-name">ParkEase — Reports</span>
+  </div>
+  <div class="topnav__links">
+    <a href="dashboard.html" class="topnav__link">⊞ Dashboard</a>
+    <a href="register.html"  class="topnav__link">🚗 Register</a>
+    <a href="signout.html"   class="topnav__link">↗ Sign-out</a>
+    <a href="reports.html"   class="topnav__link is-active">📊 Reports</a>
+  </div>
+  <div class="topnav__user">
+    <button class="btn btn--outline btn--sm" onclick="downloadPDF()">⬇ PDF</button>
+    <button class="btn btn--primary btn--sm" onclick="exportCSV()">📋 Export CSV</button>
+    <button class="btn btn--ghost btn--sm" onclick="logout()">⏏</button>
+  </div>
+</nav>
+
+<div class="page-wrapper--wide">
+
+  <!-- Header -->
+  <div class="reports-header">
+    <div class="page-header" style="margin-bottom:0">
+      <h1>Revenue Overview</h1>
+      <p>Financial performance for the selected operational period.</p>
+    </div>
+    <div class="date-navigator">
+      <button class="date-nav-btn" onclick="changeDate(-1)">‹</button>
+      <span id="selected-date">March 08, 2026</span>
+      <button class="date-nav-btn" onclick="changeDate(1)">›</button>
+    </div>
+  </div>
+
+  <!-- Revenue Cards — with service images -->
+  <div class="revenue-cards">
+
+    <div class="rev-card" style="border-top:3px solid var(--color-green-400)">
+      <img class="rev-card__img-strip" src="assets/parking-aerial.webp" alt="Parking facility aerial view">
+      <div class="rev-card__header">
+        <div class="rev-card__label"><span>🅿</span> Parking Revenue</div>
+        <span class="rev-card__icon">🚗</span>
+      </div>
+      <div class="rev-card__amount" id="parking-rev">UGX 1,240,000</div>
+      <div class="rev-card__trend is-up" id="parking-change">12% vs previous day average</div>
+      <div class="rev-card__sub" id="parking-sub">142 vehicles processed today</div>
+    </div>
+
+    <div class="rev-card" style="border-top:3px solid var(--color-amber-400)">
+      <img class="rev-card__img-strip" src="assets/tyre-wash.webp" alt="Tyre clinic service">
+      <div class="rev-card__header">
+        <div class="rev-card__label"><span>🔧</span> Tyre Clinic</div>
+        <span class="rev-card__icon">⚙</span>
+      </div>
+      <div class="rev-card__amount" id="tyre-rev">UGX 450,000</div>
+      <div class="rev-card__trend is-up" id="tyre-change">5.4% vs previous day</div>
+      <div class="rev-card__sub" id="tyre-sub">18 services completed today</div>
+    </div>
+
+    <div class="rev-card" style="border-top:3px solid var(--color-blue-500)">
+      <img class="rev-card__img-strip" src="assets/carwash-exterior.jpg" alt="Car wash services">
+      <div class="rev-card__header">
+        <div class="rev-card__label"><span>🔋</span> Battery Hire</div>
+        <span class="rev-card__icon">⚡</span>
+      </div>
+      <div class="rev-card__amount" id="battery-rev">UGX 180,000</div>
+      <div class="rev-card__trend is-down" id="battery-change">2.1% vs previous day</div>
+      <div class="rev-card__sub" id="battery-sub">12 units currently on hire</div>
+    </div>
+
+  </div>
+
+  <!-- Transactions Table -->
+  <div class="card" style="margin-bottom:0">
+    <div class="card__header">
+      <div class="card__title">
+        <span class="card__title-icon">📋</span> All Signed-out Vehicles
+      </div>
+      <span
+        style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"
+        id="table-count"
+      >Showing — of — records</span>
+    </div>
+
+    <div class="table-controls">
+      <div class="table-search">
+        <span style="color:var(--text-muted)">🔍</span>
+        <input
+          type="text"
+          placeholder="Filter by plate or receipt number..."
+          id="table-filter"
+          oninput="filterTable(this.value)"
+        >
+      </div>
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">
+        Page Total: <strong id="visible-total" style="color:var(--color-navy-700);font-size:13px">—</strong>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Receipt #</th>
+            <th>Plate Number</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Duration</th>
+            <th>Fee (UGX)</th>
+          </tr>
+        </thead>
+        <tbody id="reports-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="grand-total-row">
+      <span class="gt-label">Daily Grand Total:</span>
+      <span class="gt-value" id="grand-total">—</span>
+    </div>
+
+    <div class="pagination-row">
+      <span class="pagination-info" id="page-info">Showing — of — transactions</span>
+      <div class="page-btns" id="page-buttons"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="admin-footer">
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px">
+    <img src="assets/logo.png" alt="ParkEase" style="width:28px;height:28px;border-radius:6px;object-fit:cover">
+    <span style="font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-secondary)">Admin Control Panel</span>
+  </div>
+  <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">
+    © 2026 ParkEase Systems Ltd · Plot 45, Kampala Road · All financial data is encrypted and audited.
+  </p>
+</div>
+
+<script src="js/validation.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/reports.js"></script>
+</body>
+</html>
