@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkEase — Sign In</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    /* ── Login page overrides ── */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    /* Left panel — parking lot hero image */
+    .lp-left {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 48px;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .lp-left__bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('assets/parking-night.webp');
+      background-size: cover;
+      background-position: center;
+      z-index: 0;
+    }
+
+    /* Dark gradient overlay so text stays readable */
+    .lp-left__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(20, 32, 96, 0.72) 0%,
+        rgba(9, 14, 40, 0.88) 100%
+      );
+      z-index: 1;
+    }
+
+    .lp-left__content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .lp-left__logo {
+      margin-bottom: 32px;
+    }
+
+    .lp-left__logo img {
+      width: 110px;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .lp-left__tagline {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .lp-left__tagline span {
+      color: var(--color-green-300);
+    }
+
+    .lp-left__sub {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 32px;
+    }
+
+    /* Feature chips */
+    .feature-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .feature-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+    }
+
+    .feature-chip .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-green-300);
+    }
+
+    /* Right panel — login form */
+    .lp-right {
+      width: 440px;
+      flex-shrink: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 52px 44px;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.12);
+    }
+
+    .lp-right__logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .lp-right__logo img {
+      width: 72px;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .lp-right__logo h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--color-navy-800);
+      margin-top: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .lp-right__logo p {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Demo credential cards */
+    .demo-section {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .demo-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .demo-card {
+      background: var(--bg-page);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .demo-card:hover {
+      border-color: var(--color-green-400);
+      background: var(--color-green-100);
+    }
+
+    .demo-card .dc-icon { font-size: 22px; }
+
+    .demo-card .dc-role {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .demo-card .dc-creds {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-navy-700);
+      margin-top: 3px;
+    }
+
+    @media (max-width: 900px) {
+      .lp-left { display: none; }
+      .lp-right { width: 100%; }
+    }
+  </style>
+</head>
+<body style="background:#0d1a4a">
+
+<div class="login-page">
+
+  <!-- LEFT — Hero image + branding -->
+  <div class="lp-left">
+    <div class="lp-left__bg"></div>
+    <div class="lp-left__overlay"></div>
+    <div class="lp-left__content">
+      <div class="lp-left__logo">
+        <img src="assets/logo.png" alt="ParkEase Logo">
+      </div>
+      <h1 class="lp-left__tagline">
+        Smart parking.<br>
+        <span>Guaranteed safety.</span>
+      </h1>
+      <p class="lp-left__sub">Kampala, Uganda · Est. 2026</p>
+      <div class="feature-chips">
+        <span class="feature-chip"><span class="chip-dot"></span>Vehicle Registration</span>
+        <span class="feature-chip"><span class="chip-dot"></span>Automated Billing</span>
+        <span class="feature-chip"><span class="chip-dot"></span>Tyre Clinic</span>
+        <span class="feature-chip"><span class="chip-dot"></span>Battery Hire</span>
+        <span class="feature-chip"><span class="chip-dot"></span>Revenue Reports</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — Login form -->
+  <div class="lp-right">
+    <div class="lp-right__logo">
+      <img src="assets/logo.png" alt="ParkEase">
+      <h2>ParkEase</h2>
+      <p>Integrated Parking &amp; Vehicle Services</p>
+    </div>
+
+    <div class="login-error-alert" id="login-error">
+      Invalid username or password. Please try again.
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        class="form-control-light"
+        placeholder="Enter your username"
+        autocomplete="username"
+      >
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        class="form-control-light"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+      >
+    </div>
+
+    <button class="btn btn--teal btn--full" id="login-btn" onclick="handleLogin()">
+      Sign In to Dashboard
+    </button>
+
+    <div class="demo-section">
+      <p class="demo-label">Quick Login — Demo Accounts</p>
+      <div class="demo-grid">
+        <div class="demo-card" onclick="fillCredentials('admin','admin123')">
+          <div class="dc-icon">🛡️</div>
+          <span class="dc-role">Administrator</span>
+          <span class="dc-creds">admin / admin123</span>
+        </div>
+        <div class="demo-card" onclick="fillCredentials('attendant','park2026')">
+          <div class="dc-icon">🎫</div>
+          <span class="dc-role">Attendant</span>
+          <span class="dc-creds">attendant / park2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/validation.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  document.getElementById('username').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('password').focus();
+  });
+  document.getElementById('password').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleLogin();
+  });
+  function fillCredentials(u, p) {
+    document.getElementById('username').value = u;
+    document.getElementById('password').value = p;
+    document.getElementById('login-btn').focus();
+  }
+</script>
+</body>
+</html>
