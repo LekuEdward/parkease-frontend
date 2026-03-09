@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkEase — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    /* ── Dashboard-specific styles ── */
+
+    /* Hero banner at top of page content */
+    .dash-hero {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      height: 140px;
+      margin-bottom: 24px;
+    }
+
+    .dash-hero__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 60%;
+      display: block;
+    }
+
+    .dash-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg,
+        rgba(20, 32, 96, 0.85) 0%,
+        rgba(20, 32, 96, 0.55) 60%,
+        rgba(20, 32, 96, 0.15) 100%
+      );
+    }
+
+    .dash-hero__text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 28px;
+    }
+
+    .dash-hero__text h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    .dash-hero__text p {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-top: 4px;
+    }
+
+    /* Sidebar logo image override */
+    .sidebar__logo-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    /* stat-card--green accent bar fix */
+    .stat-card__accent-bar--green {
+      background: linear-gradient(90deg, var(--color-green-400), var(--color-green-600));
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar__logo">
+      <img class="sidebar__logo-img" src="assets/logo.png" alt="ParkEase Logo">
+      <div class="sidebar__logo-text">
+        <h2>ParkEase</h2>
+        <span>Parking Management</span>
+      </div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <p class="sidebar__nav-section">Main</p>
+      <a href="dashboard.html" class="sidebar__nav-link is-active">
+        <span class="sidebar__nav-icon">⊞</span> Dashboard
+      </a>
+      <a href="register.html" class="sidebar__nav-link">
+        <span class="sidebar__nav-icon">🚗</span> Register Vehicle
+      </a>
+      <a href="signout.html" class="sidebar__nav-link">
+        <span class="sidebar__nav-icon">↗</span> Sign-out Vehicle
+      </a>
+      <p class="sidebar__nav-section" style="margin-top:10px">Admin</p>
+      <a href="reports.html" class="sidebar__nav-link">
+        <span class="sidebar__nav-icon">📊</span> Revenue Reports
+      </a>
+      <a href="#" class="sidebar__nav-link">
+        <span class="sidebar__nav-icon">⚙</span> Settings
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      <div class="sidebar__avatar" id="user-avatar">A</div>
+      <div>
+        <span class="sidebar__user-name" id="user-name">Alex Mukasa</span>
+        <span class="sidebar__user-role" id="user-role">Attendant #04</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN AREA ═══ -->
+  <div class="main-area">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div>
+        <div class="topbar__page-title">Attendant Dashboard</div>
+        <div class="topbar__subtitle" id="today-date">—</div>
+      </div>
+      <div class="topbar__actions">
+        <div class="topbar__search">
+          <span style="color:var(--text-muted);font-size:13px">🔍</span>
+          <input
+            type="text"
+            placeholder="Search plate number..."
+            id="plate-search"
+            oninput="searchPlate(this.value)"
+          >
+        </div>
+        <div class="shift-pill">08:00 AM – 04:00 PM</div>
+        <button class="icon-btn" title="Notifications">
+          🔔 <span class="icon-btn__dot"></span>
+        </button>
+        <button class="btn btn--ghost btn--sm" onclick="logout()">⏏ Logout</button>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+
+      <!-- Parking lot hero banner -->
+      <div class="dash-hero">
+        <img class="dash-hero__img" src="assets/parking-day.webp" alt="ParkEase parking facility">
+        <div class="dash-hero__overlay"></div>
+        <div class="dash-hero__text">
+          <h2>Welcome back, <span id="hero-name">Attendant</span> 👋</h2>
+          <p>Kampala Parking Facility · Plot 45, Kampala Road</p>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-card__accent-bar stat-card__accent-bar--green"></div>
+          <div class="stat-card__header">
+            <span class="stat-card__label">Vehicles Parked Today</span>
+            <span class="stat-card__icon stat-card__icon--green">🚗</span>
+          </div>
+          <div class="stat-card__value" id="stat-parked">0</div>
+          <div class="stat-card__meta"><span class="up">↑ 12</span> more than yesterday</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card__accent-bar stat-card__accent-bar--blue"></div>
+          <div class="stat-card__header">
+            <span class="stat-card__label">Today's Revenue</span>
+            <span class="stat-card__icon stat-card__icon--blue">💰</span>
+          </div>
+          <div class="stat-card__value">
+            <span style="font-size:13px;font-weight:500;color:var(--text-muted)">UGX </span><span id="stat-revenue">0</span>
+          </div>
+          <div class="stat-card__meta">Across all vehicle categories</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card__accent-bar stat-card__accent-bar--amber"></div>
+          <div class="stat-card__header">
+            <span class="stat-card__label">Available Slots</span>
+            <span class="stat-card__icon stat-card__icon--amber">🅿</span>
+          </div>
+          <div class="stat-card__value">
+            28 <span>/ 150</span>
+          </div>
+          <div class="occupancy-bar">
+            <div class="occupancy-bar__fill" style="width:81%"></div>
+          </div>
+          <div class="stat-card__meta" id="stat-slots">81% Occupancy Rate</div>
+        </div>
+
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <div class="card__header">
+          <div class="card__title">
+            <span class="card__title-icon">⚡</span> Quick Actions
+          </div>
+        </div>
+        <div class="quick-actions">
+          <a href="register.html" class="btn btn--primary">＋ Register New Arrival</a>
+          <a href="signout.html"  class="btn btn--outline">↗ Process Sign-out</a>
+          <button class="btn btn--ghost" onclick="printDailySummary()">🖨 Print Daily Summary</button>
+        </div>
+      </div>
+
+      <!-- Recent Arrivals Table -->
+      <div class="card">
+        <div class="card__header">
+          <div class="card__title">
+            <span class="card__title-icon">🕐</span> Recent Arrivals
+          </div>
+          <a href="signout.html" class="card__action-link">Process Sign-outs →</a>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Plate Number</th>
+                <th>Vehicle Type</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="arrivals-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="page-footer">
+      <span>ParkEase v2.4.0 · Guaranteed Safety since 2026</span>
+      <div class="page-footer__status">
+        <span class="status-dot"></span>
+        Session started: <span id="session-time">—</span>
+      </div>
+    </footer>
+
+  </div>
+</div>
+
+<script src="js/validation.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+<script>
+  // Update hero greeting name from session
+  document.addEventListener('DOMContentLoaded', function() {
+    var s = JSON.parse(localStorage.getItem('parkease_session') || '{}');
+    var heroEl = document.getElementById('hero-name');
+    if (heroEl && s.name) heroEl.textContent = s.name.split(' ')[0];
+  });
+</script>
+</body>
+</html>
