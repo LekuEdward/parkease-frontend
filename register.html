@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkEase — Vehicle Registration</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/logo.png">
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="topnav">
+  <div class="topnav__brand">
+    <img src="assets/logo.png" alt="ParkEase" style="width:30px;height:30px;border-radius:6px;object-fit:cover">
+    <span class="topnav__brand-name">ParkEase</span>
+  </div>
+  <div class="topnav__links">
+    <a href="dashboard.html" class="topnav__link">⊞ Dashboard</a>
+    <a href="register.html"  class="topnav__link is-active">🚗 Registration</a>
+    <a href="signout.html"   class="topnav__link">↗ Sign-out</a>
+    <a href="reports.html"   class="topnav__link">📊 Reports</a>
+  </div>
+  <div class="topnav__user">
+    <div class="topnav__user-text">
+      <strong id="user-name">—</strong>
+      <small id="user-role">—</small>
+    </div>
+    <div class="topnav__avatar" id="user-avatar">—</div>
+    <button class="btn btn--ghost btn--sm" onclick="logout()">⏏</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <h1>Vehicle Registration</h1>
+    <p>Register incoming vehicles for secure entry and automated billing.</p>
+  </div>
+
+  <form id="register-form" novalidate>
+
+    <!-- SECTION 1: Driver Information -->
+    <div class="form-section">
+      <div class="form-section__title">👤 Driver Information</div>
+      <div class="form-row">
+
+        <div class="form-group">
+          <label class="form-label" for="driver-name">Full Name</label>
+          <input
+            type="text"
+            id="driver-name"
+            class="form-control-light"
+            placeholder="e.g. John Baptist Ssemuwemba"
+          >
+          <div class="form-hint">Enter the full name exactly as it appears on the driver's ID.</div>
+          <div class="form-error" id="driver-name-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <div class="input-group">
+            <span class="input-group__prefix">📞</span>
+            <input
+              type="text"
+              id="phone"
+              class="form-control-light"
+              placeholder="+256 700 000 000"
+            >
+          </div>
+          <div class="form-hint">Format: +256XXXXXXXXX, 07XXXXXXXX, or 06XXXXXXXX</div>
+          <div class="form-error" id="phone-error"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 2: Vehicle Information -->
+    <div class="form-section">
+      <div class="form-section__title">🚗 Vehicle Information</div>
+      <div class="form-row">
+
+        <div class="form-group">
+          <label class="form-label" for="vehicle-type">Vehicle Type</label>
+          <select id="vehicle-type" class="form-control-light">
+            <option value="">— Select vehicle type —</option>
+            <option value="Personal Car">Personal Car</option>
+            <option value="Taxi">Taxi</option>
+            <option value="Truck">Truck</option>
+            <option value="Coaster">Coaster</option>
+            <option value="Boda-boda">Boda-boda (Motorcycle)</option>
+          </select>
+          <div class="form-error" id="vehicle-type-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="plate">Number Plate</label>
+          <div class="input-group">
+            <span class="input-group__prefix" style="font-size:11px;letter-spacing:1px">#</span>
+            <input
+              type="text"
+              id="plate"
+              class="form-control-light"
+              placeholder="e.g. UBA 123X"
+              style="text-transform:uppercase;letter-spacing:1.5px;font-family:var(--font-mono);font-weight:600"
+            >
+          </div>
+          <div class="form-hint">Must start with <strong>U</strong>, max 8 characters. Verify against the vehicle.</div>
+          <div class="form-error" id="plate-error"></div>
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="model-color">Vehicle Model &amp; Colour</label>
+        <input
+          type="text"
+          id="model-color"
+          class="form-control-light"
+          placeholder="e.g. Toyota Harrier, Silver"
+        >
+        <div class="form-error" id="model-color-error"></div>
+      </div>
+
+      <!-- NIN section — only visible for Boda-boda -->
+      <div id="nin-section">
+        <div class="nin-alert-box">
+          <div class="nin-notice">⚠ NIN Required for Boda-boda Registration</div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="nin">NIN Number (National ID)</label>
+            <input
+              type="text"
+              id="nin"
+              class="form-control-light"
+              placeholder="e.g. CM12345678A"
+              style="text-transform:uppercase;letter-spacing:1.5px;font-family:var(--font-mono)"
+            >
+            <div class="form-hint">Format: 2 letters + 8–10 alphanumeric + 1 letter (e.g. CM12345678A)</div>
+            <div class="form-error" id="nin-error"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION 3: Parking Fee Schedule reference -->
+    <div class="form-section" style="background:var(--bg-page)">
+      <div class="form-section__title">💳 Parking Fee Schedule (for reference)</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Vehicle Type</th>
+            <th>Short Stay (&lt; 3 hours)</th>
+            <th>Day Rate (6am – 7pm)</th>
+            <th>Night Rate (7pm – 6am)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Personal Car</td><td>UGX 2,000</td><td>UGX 3,000 / hr</td><td>UGX 2,000 / hr</td></tr>
+          <tr><td>Taxi</td><td>UGX 2,000</td><td>UGX 3,000 / hr</td><td>UGX 2,000 / hr</td></tr>
+          <tr><td>Truck</td><td>UGX 2,000</td><td>UGX 5,000 / hr</td><td>UGX 10,000 / hr</td></tr>
+          <tr><td>Coaster</td><td>UGX 3,000</td><td>UGX 4,000 / hr</td><td>UGX 2,000 / hr</td></tr>
+          <tr><td>Boda-boda</td><td>UGX 1,000</td><td>UGX 2,000 / hr</td><td>UGX 2,000 / hr</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Form Actions -->
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <button
+        type="submit"
+        class="btn btn--primary"
+        style="flex:1;justify-content:center;padding:13px;font-size:var(--text-base)"
+      >
+        🖨 Register &amp; Print Receipt
+      </button>
+      <button type="button" class="btn btn--outline" onclick="clearForm()">
+        ✕ Clear Form
+      </button>
+    </div>
+
+    <!-- Tips panel -->
+    <div class="tips-panel">
+      <div class="tips-panel__title">💡 Operator Tips</div>
+      <ul>
+        <li>Use <kbd>Tab</kbd> to move between fields quickly.</li>
+        <li>NIN is <strong>mandatory</strong> for all Boda-boda (motorcycle) registrations.</li>
+        <li>Double-check the plate number before registering — it cannot be edited later.</li>
+        <li>Plate must start with <kbd>U</kbd>, be alphanumeric, and no longer than 8 characters.</li>
+      </ul>
+    </div>
+
+  </form>
+</div>
+
+<footer class="page-footer">
+  <span>ParkEase v2.4.0 · Guaranteed Safety since 2026</span>
+  <div class="page-footer__status">
+    <span class="status-dot"></span>
+    Session started: <span id="session-time">—</span>
+  </div>
+</footer>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="success-modal">
+  <div class="modal-box">
+    <span class="modal-box__icon">✅</span>
+    <h2 class="modal-box__title">Vehicle Registered!</h2>
+    <p class="modal-box__message">
+      The vehicle has been successfully registered and is now active in the system. Your receipt number is:
+    </p>
+    <div class="modal-box__receipt-no" id="receipt-number">PE-2026-03-0001</div>
+    <div class="modal-box__actions">
+      <button class="btn btn--primary" onclick="closeModal()">🖨 Print Receipt</button>
+      <button class="btn btn--outline" onclick="closeModal()">Register Another</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/validation.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/register.js"></script>
+</body>
+</html>
